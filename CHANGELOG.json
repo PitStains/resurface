@@ -1,5 +1,15 @@
 [
   {
+    "version": "0.12.7",
+    "date": "2026-07-27",
+    "changes": [
+      "Documentation only: the README was rewritten to read less like it was generated"
+    ],
+    "whatToTest": [
+      "Nothing. No code changed in this release."
+    ]
+  },
+  {
     "version": "0.12.6",
     "date": "2026-07-27",
     "changes": [
