@@ -1,0 +1,11 @@
+{
+  "name": "@resurface/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@hono/node-server": "^2.0.12",
+    "@resurface/core": "*",
+    "hono": "^4.6.0"
+  }
+}

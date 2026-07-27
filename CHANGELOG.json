@@ -1,0 +1,330 @@
+[
+  {
+    "version": "0.12.5",
+    "date": "2026-07-27",
+    "changes": [
+      "A mistyped API address now returns a proper 'no such endpoint' instead of quietly handing back the web page with a 200",
+      "Vault detection no longer looks in a folder named after the author's own project directory",
+      "Eight internal helpers stopped being published as part of the library's public interface",
+      "The plan now marks what was designed but never built - collections, per-snip notes, quote cards, the Obsidian deep link and the evaluation harness",
+      "The security notes were re-audited and a claim that had gone stale was corrected"
+    ],
+    "whatToTest": [
+      "Nothing user-facing should have changed; this release is repository housekeeping before the code goes public"
+    ]
+  },{
+    "version": "0.12.4",
+    "date": "2026-07-27",
+    "changes": [
+      "The meaning index now keeps itself current: snips added by a sync are embedded on their own, instead of waiting to be noticed",
+      "It also catches up shortly after the app starts, for snips that arrived while it was closed",
+      "Nothing was ever losing your vectors - they simply stopped being added after the last time the button was pressed",
+      "A first build is still a deliberate press, because it downloads a model and takes about 45 minutes for 30,000 snips",
+      "Rebuild now asks before re-embedding a finished index"
+    ],
+    "whatToTest": [
+      "Sync now with new snips in your vault - the dashboard should show it embedding them without being asked",
+      "Dashboard - Meaning index - it should say 'ready' and leave you alone"
+    ]
+  },{
+    "version": "0.12.3",
+    "date": "2026-07-27",
+    "changes": [
+      "First run is cleaner: no dead navigation links before you've chosen a vault, and no changelog for a version you've never used",
+      "A mistyped vault path now tells you which mistake you made - the folder isn't there, or it holds no Snipd export",
+      "Errors from the app now reach you in its own words rather than as a status code",
+      "The NotebookLM export refuses to write a folder with nothing in it",
+      "New on the Ask page: package your whole library for NotebookLM as Markdown files it will actually accept",
+      "Group by show, by category, or by date - the file names become the citations NotebookLM shows you",
+      "Files are kept under NotebookLM's 500,000-word limit, and the file count under its sources-per-notebook cap, with a live count before you commit",
+      "Writes a guide explaining that the quotes are transcribed speech, which hosted models otherwise mistake for your own writing",
+      "Writes step-by-step import instructions, deliberately outside the folder you upload"
+    ],
+    "whatToTest": [
+      "Ask - 'Package this library for NotebookLM' - try 'One file per category', which fits even the free plan",
+      "Create the import folder; it should open in Explorer with a sources folder and HOW-TO-IMPORT.md beside it"
+    ]
+  },{
+    "version": "0.12.2",
+    "date": "2026-07-27",
+    "changes": [
+      "Fixed the app freezing and every page going blank: clicking inside the console window it starts in puts Windows into 'Select' mode, which stops the server dead the next time it prints anything",
+      "The server now writes to a log file instead of that window, so a stray click can no longer reach it",
+      "When the server does stop answering, the app says so in plain words instead of showing empty pages",
+      "Requests give up after 20 seconds rather than hanging forever; slow ones (Ask, backups, restore, sync) still get five minutes"
+    ],
+    "whatToTest": [
+      "Start Resurface.bat, then click and drag inside the black window - the app should keep working",
+      "Close the window while the app is open in the browser; you should get a red bar saying it isn't responding, which clears itself if you start it again"
+    ]
+  },{
+    "version": "0.12.1",
+    "date": "2026-07-26",
+    "changes": [
+      "Backups are now checked against the database they were copied from - a snapshot that quietly lost data can no longer pass as good",
+      "Each snapshot records what it contained, so a restore can tell whether the file still holds it",
+      "The write-ahead log is capped at 64 MB instead of growing without limit",
+      "Asking for absurd page sizes no longer dumps the whole library in one response",
+      "Reviewing or re-labelling a snip that doesn't exist now says so instead of failing with a server error",
+      "An out-of-range month in Wrapped is rejected rather than silently answered with the whole year"
+    ],
+    "whatToTest": [
+      "Dashboard - Backups - Back up now; the panel should report the snips and vectors it verified",
+      "Everything should behave exactly as before; this release is mostly about what happens when things go wrong"
+    ]
+  },{
+    "version": "0.12.0",
+    "date": "2026-07-26",
+    "changes": [
+      "Filter any search by who made the snip — you, or Snipd's template — in all three search modes",
+      "'Made by me' works on its own with no search text, so you can just browse the 4,239 snips you wrote",
+      "New dashboard panel shows the split, and lets you settle the borderline ones yourself; your answer is permanent",
+      "Starred loads 4x faster: it was downloading every full note to render a five-line preview",
+      "Fixed timestamps showing as NaN:NaN in the borderline list"
+    ],
+    "whatToTest": [
+      "Dashboard → 'Who made your snips' → 'Browse the ones you made'",
+      "Search anything, then set the dropdown to 'Made by me' — try it in Smart and Keyword",
+      "Dashboard → settle a couple of borderline snips; the count should drop and they shouldn't come back",
+      "Starred should feel noticeably quicker to load"
+    ]
+  },
+  {
+    "version": "0.11.0",
+    "date": "2026-07-26",
+    "changes": [
+      "Resurface now checks its own database regularly and tells you the moment anything is wrong, naming the backup to restore",
+      "Keyboard use fixed: there was no visible focus indicator at all, and no way to skip past the navigation",
+      "The Dashboard and Search pages had no heading for screen readers to announce; they do now",
+      "Motion is reduced automatically if your system asks for it",
+      "New INSTALL.md: first run, updating, starting at login, every setting, and what to do when something breaks"
+    ],
+    "whatToTest": [
+      "Tab through the app with the keyboard — you should see where you are, and 'Skip to content' should appear first",
+      "Dashboard → Backups should say 'checked and sound'",
+      "Read INSTALL.md and try the autostart steps if you want it running at login"
+    ]
+  },{
+    "version": "0.10.0",
+    "date": "2026-07-26",
+    "changes": [
+      "Automatic backups: a full snapshot once a day, and a small record of your review history, bookmarks and category names saved constantly",
+      "Every snapshot is opened and integrity-checked before it's kept — a backup nobody has verified is only a guess",
+      "Restore any snapshot from the dashboard in a couple of seconds, without stopping the app",
+      "Restoring never deletes what it replaces: the old database is moved aside, not removed",
+      "The write-ahead log is now folded back in periodically, so it can't grow into the hundreds of megabytes where checkpointing started failing",
+      "Start Resurface.bat now repairs a half-installed embedding library instead of starting into a broken state"
+    ],
+    "whatToTest": [
+      "Dashboard → Backups: it should already list a snapshot taken shortly after startup",
+      "Press 'Back up now' — it should finish in a few seconds and report the snips it verified",
+      "Press Restore on a snapshot, confirm, and check search and Review still work afterwards",
+      "Look in %LOCALAPPDATA%\\Resurface\\backups — the work-*.json files are small enough to keep forever"
+    ]
+  },
+  {
+    "version": "0.9.2",
+    "date": "2026-07-21",
+    "changes": [
+      "Starred snips now show a five-line preview and expand in place to the full note and transcript, like everywhere else",
+      "Ask: each cited source expands to the whole snip on the page, so following a citation no longer means leaving Ask",
+      "Fixed the update script leaving the local embedding library half-installed, which made the meaning index look empty and rebuild itself"
+    ],
+    "whatToTest": [
+      "Starred → a favorite snip should show a few lines, then 'Read the full snip' should open the rest in place",
+      "Ask something, then expand a source to read the full snip without leaving the page",
+      "After the next update, the meaning index should still show its full count — no surprise rebuild"
+    ]
+  },
+  {
+    "version": "0.9.1",
+    "date": "2026-07-21",
+    "changes": [
+      "Read any snip where you find it: every snip in search, review, the digest and tag pages now expands in place instead of sending you to its episode",
+      "Expansions are collapsed by default and load only when you open one, so long lists stay fast",
+      "Where the notes are already on screen, expanding goes straight to the transcript rather than asking for a second click"
+    ],
+    "whatToTest": [
+      "Search something, then expand a result — the full transcript should appear without leaving the page",
+      "Review → expand a card; a hand-made snip should show its whole note inline",
+      "Collapse it again — the page should return exactly to where it was"
+    ]
+  },{
+    "version": "0.9.0",
+    "date": "2026-07-21",
+    "changes": [
+      "Daily review: a handful of snips a day out of 32,000, chosen so the ones you'd forgotten come back",
+      "Keeping a snip widens when it returns — 3 days, then a week, three weeks, two months, six months",
+      "'Stop showing' takes a snip out of review only; it stays in your library, search, stats and exports",
+      "Every card says why it was picked, and 3 of the 5 are snips you made by hand",
+      "This week: a digest of what you snipped, which themes rose against last week, and older snips never resurfaced",
+      "Subscribe to the digest as a feed — no account, no email, nothing sent anywhere",
+      "On this day: what you were listening to on this date in earlier months",
+      "Surprise me: one click for the oldest thing you've never had resurfaced",
+      "Wrapped can now be saved as an image",
+      "The app and the command line no longer open the database at the same time — a sync is handed to the running app instead"
+    ],
+    "whatToTest": [
+      "Review → read the five cards and their reasons; press Keep on one and reload — it should be gone for 3 days",
+      "Review → 'Stop showing' on something, then search for it: it should still be there",
+      "This week → check the rising themes against what you actually listened to",
+      "This week → 'Surprise me' a few times; it should reach back into January",
+      "This week → 'subscribe by feed' and add it to any RSS reader",
+      "Wrapped → 'Save as image'",
+      "Run 'npm run import' while the app is open — it should hand the sync over rather than open the database"
+    ]
+  },
+  {
+    "version": "0.8.0",
+    "date": "2026-07-21",
+    "changes": [
+      "Auto vs. manual snips: Resurface now tells the snips Snipd made from the ones you made — by the shape of the note, never its length of audio",
+      "Only 189 of 32,212 snips are borderline, and they're listed for you to settle; whatever you decide sticks, even after a re-import",
+      "Topics are named after ideas, not speakers: a label that used to end in a host's name now ends in the subject instead",
+      "Topic labels drop names your export states outright, and any word confined to fewer shows than the topic it labels",
+      "Ask: connecting a local model now checks it actually works first, so it can never sit in a connected-but-broken state",
+      "Ask: the local-model panel is always visible, says in plain words what's wrong and how to fix it, and can disconnect",
+      "Wrapped: 'Your week' says what it's counting, and switches between snips, episodes and time listened",
+      "Fixed a database corruption bug: workers no longer run schema changes alongside the main app, and writers wait their turn"
+    ],
+    "whatToTest": [
+      "Open the most recent episode — your two hand-made snips should read as manual, the rest as auto",
+      "Topics → Find topics, then read the labels: no host or guest names should appear",
+      "Ask → the local model panel at the bottom: press Test connection and read what it tells you",
+      "Wrapped → 'Your week' → switch to Time listened, then Episodes",
+      "Search and Starred should be unchanged — auto/manual deliberately does not affect ranking"
+    ]
+  },
+  {
+    "version": "0.7.0",
+    "date": "2026-07-21",
+    "changes": [
+      "Ask: put a question to your own library and get an answer with a citation on every line — passages are quoted verbatim, so nothing can be invented",
+      "Optional local model: connect Ollama for a written summary over the same cited passages; without it Ask still works",
+      "Categories: your own editable taxonomy, seeded from discovered topics — rename, merge, delete, and pin or remove individual snips",
+      "Pinned snips define what a category means, and re-assigning never undoes your corrections",
+      "Wrapped: every leaderboard now shows the top 5 with a dropdown for 10, 25 or all",
+      "Wrapped: new leaderboards for most favorites, busiest days, biggest months, longest, most-snipped and densest episodes",
+      "Wrapped: view any single month, not just the whole year — compared against the same month last year"
+    ],
+    "whatToTest": [
+      "Ask → put a real question to your library and check the sources actually answer it",
+      "Wrapped → pick a month from the new dropdown; the headline and every list should follow",
+      "Wrapped → open any leaderboard's Top 5 dropdown and switch to 25",
+      "Categories → Seed from topics, then Re-assign all snips (about a minute)",
+      "Open a category, remove a snip that doesn't belong, then re-assign — it should stay removed",
+      "Rename a category to something meaningful to you, and merge two that overlap"
+    ]
+  },
+  {
+    "version": "0.6.0",
+    "date": "2026-07-21",
+    "changes": [
+      "Topics: Resurface groups your snips by meaning and names each group after the words that set it apart — 36 topics across 32k snips, found in about 15 seconds",
+      "Map: every snip as a point, colored by topic; pick a topic to light up its island and read its most typical snips",
+      "Topic pages list the most central snips first — the clearest examples of what each topic actually is",
+      "Smart search modes now report what their counts mean, so Keyword, Smart and Meaning are comparable at a glance",
+      "Smart search works on a partially built index instead of silently falling back to keyword"
+    ],
+    "whatToTest": [
+      "Topics → Find topics (needs the meaning index; takes about a minute)",
+      "Open a topic and read its most typical snips — do the labels match what's inside?",
+      "Map → pick a topic from the dropdown; its island lights up and the rest fades",
+      "Hover points on the map to see which snip is where",
+      "Search 'how do you pray' in Keyword, then Smart, then Meaning only — the results and the counts should now differ visibly",
+      "Rebuild topics after a big sync to fold new snips in"
+    ]
+  },
+  {
+    "version": "0.5.0",
+    "date": "2026-07-21",
+    "changes": [
+      "Meaning index: Resurface can now find snips by idea, not just by wording — built locally on your CPU, nothing uploaded",
+      "Similar snips on every snip: neighbors from anywhere in your library, excluding the same episode",
+      "Smart search blends keywords with meaning (reciprocal rank fusion); 'Meaning only' and 'Keyword' modes are one dropdown away",
+      "Build/Resume/Stop the index from the dashboard with live progress — it runs in the background and never blocks the app",
+      "Index builds are throttled: Gentle (default) uses about one core at below-normal priority, so your PC stays usable — and it's barely slower than Fast",
+      "The index is resumable: stopping keeps every vector already built, and new snips are embedded incrementally",
+      "Fixed: a UTF-8 byte-order mark in package.json broke 'Update Resurface.bat' builds"
+    ],
+    "whatToTest": [
+      "Dashboard → Meaning index → Build index (first run downloads a ~25 MB model, then ~55 minutes for 32k snips in Gentle)",
+      "While it builds, keep using your PC — Task Manager should show roughly one core busy; Stop and Resume should lose nothing",
+      "Open any episode and click 'Similar snips' under a snip you know well",
+      "Search something you'd struggle to word exactly, e.g. 'how do I stop worrying about the future'",
+      "Compare the Smart and Keyword modes on the same query — Smart should surface snips that never use your words",
+      "Try 'Meaning only' for a vague theme like 'assurance in suffering'"
+    ]
+  },
+  {
+    "version": "0.4.0",
+    "date": "2026-07-21",
+    "changes": [
+      "Snipd tags are first-class: a Tags page, clickable #chips everywhere, tag filters with live counts in search, and tag:chat syntax",
+      "Search now works with tags alone — no keywords needed — and every result names its podcast first",
+      "Starred rows lead with the show and episode instead of burying them under the snip title",
+      "'Confirmed listening' is now 'Snip time' (audio your snips captured); listening time is the headline number, with its overcount caveat in a tooltip",
+      "Short-form shows finally show up: rank Wrapped by hours/episodes/snips/density, plus a snips-per-hour leaderboard and a short-vs-long-form split",
+      "Wrapped shows up to all 163 shows and adds ~15 new stats: busiest day, longest streak, most-snipped and densest episodes, new shows, one-and-done shows, weekday rhythm, monthly chart, top tags, books and guests, year-over-year",
+      "Shows table gains average episode length and snips-per-episode alongside snips-per-hour",
+      "Tags, snips-per-episode and average lengths are all exportable; a whole tag exports as one Markdown file"
+    ],
+    "whatToTest": [
+      "Open Tags — your most-used tag should show how many snips and shows it spans; click it to browse them",
+      "Search a common word, then click a tag chip: the result count should match the number on the chip",
+      "Type a multi-word tag like tag:\"to revisit\" in the search box with no other words",
+      "Starred → every row should name the podcast before the snip title",
+      "Dashboard: hover 'Listening time' and 'Snip time' for the new tooltips; sort the Shows table by Snips/ep",
+      "Wrapped: switch Top shows to Episodes, then to All 163 — your shortest daily shows should jump to the top",
+      "Wrapped: check the snips-per-hour leaderboard and the short-vs-long-form split for your shortest shows"
+    ]
+  },
+  {
+    "version": "0.3.0",
+    "date": "2026-07-20",
+    "changes": [
+      "Full-text search across all snips (titles, quotes, summaries, transcripts) with highlighted matches",
+      "⭐ Snipd favorites now import from your export and boost search ranking; 🔖 in-app stars are 'bookmarks'",
+      "Starred page: Snipd favorites and bookmarks in chronological order, exportable as Markdown",
+      "Never-delete: snips that vanish from the Snipd folder stay here forever, flagged 'not in vault'",
+      "Fixed: sectioned AI notes (bold '2. Main Theme' style) were partially dropped — full re-import on first start",
+      "First-run setup screen asks new users for their Snipd folder",
+      "Saved searches with 'N new' badges; Mentions (books & guests); copy-as-Markdown; MD/CSV/JSON exports",
+      "Press / anywhere to jump to search"
+    ],
+    "whatToTest": [
+      "First start re-imports and indexes everything once — expect ~30 extra seconds",
+      "Open Starred → ⭐ Snipd favorites: your in-app favorites should all be there",
+      "Spot-check a snip whose AI note has numbered sections — every section should now be present",
+      "Search something you half-remember — check speed and quality; ⭐ items rank higher",
+      "Bookmark (🔖) a snip and a show; check the Bookmarks tab and the boost in search",
+      "Open Mentions → Books: your podcast-sourced reading list",
+      "Save a search; after a future sync a 'new' badge appears when new snips match"
+    ]
+  },
+  {
+    "version": "0.2.0",
+    "date": "2026-07-20",
+    "changes": [
+      "New web app: dashboard with listening stats, activity chart, and calendar heatmap",
+      "Library: browse shows → episodes → snips, with quotes, summaries, and transcripts",
+      "Wrapped: your year in podcasts",
+      "Estimated vs confirmed listening hours (the export has no true playback history)",
+      "Sync button + automatic sync on startup; Start Resurface.bat now opens the app"
+    ],
+    "whatToTest": [
+      "Double-click Start Resurface.bat — the app should open in your browser",
+      "Dashboard: switch Past week / month / year / all time; hover the chart and calendar",
+      "Click a column header in the Shows table to re-rank (hours vs snips vs density)",
+      "Open Library → a show → an episode; expand a transcript; try 'Play in Snipd'",
+      "Check Wrapped for 2026",
+      "Click 'Sync now' after snipping something new in Snipd (and syncing Obsidian)"
+    ]
+  },
+  {
+    "version": "0.1.0",
+    "date": "2026-07-20",
+    "changes": ["Phase 0: vault parser, database, CLI import with HTML report"],
+    "whatToTest": ["Run Start Resurface.bat and review the import report"]
+  }
+]

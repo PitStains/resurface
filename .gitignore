@@ -1,0 +1,24 @@
+# Personal data — the Snipd vault and all derived user data stay local, never in git
+# (matches any renamed variant like "Snipd_dont need anymore" too)
+/Snipd*/
+*.db
+*.db-shm
+*.db-wal
+/data/
+
+# Dependencies & build output
+node_modules/
+dist/
+build/
+coverage/
+.turbo/
+
+# Agent/editor tooling that isn't part of the app
+.claude/
+
+# Environment & editor
+.env
+.env.*
+*.local
+.DS_Store
+Thumbs.db

@@ -1,0 +1,13 @@
+{
+  "name": "@resurface/core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
+    "gray-matter": "^4.0.3"
+  }
+}
