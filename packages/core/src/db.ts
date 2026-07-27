@@ -1,6 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
-import { mkdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
-import { dirname } from "node:path";
+import { existsSync, mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import { backfillSnipTags } from "./tags.ts";
 import { classifyAll } from "./snipkind.ts";
 
@@ -314,7 +314,8 @@ export class DatabaseBusyError extends Error {
   }
 }
 
-function acquireLock(dbPath: string): void {
+/** @returns a function that gives the lock back. */
+function acquireLock(dbPath: string): () => void {
   const path = lockPath(dbPath);
   try {
     const held = Number(readFileSync(path, "utf8").trim());
@@ -324,18 +325,46 @@ function acquireLock(dbPath: string): void {
     // No lock file, or an unreadable one: ours to take.
   }
   writeFileSync(path, String(process.pid), "utf8");
-  const release = () => {
+  return () => {
     try {
       if (readFileSync(path, "utf8").trim() === String(process.pid)) unlinkSync(path);
     } catch {
       /* already gone */
     }
   };
-  process.once("exit", release);
-  process.once("SIGINT", () => {
-    release();
-    process.exit(130);
-  });
+}
+
+/**
+ * Close the database on the way out.
+ *
+ * This used to release the lock and exit without closing, which left the
+ * write-ahead log on disk every single time — Ctrl-C, a closed window, a
+ * killed process. SQLite checkpoints and removes that log on a clean close, and
+ * a log left behind is the state the app was three times unable to start from.
+ * Closing properly does not prove those incidents are prevented, but it stops
+ * manufacturing the condition they all shared.
+ */
+function registerShutdown(db: DatabaseSync, releaseLock: () => void): void {
+  let done = false;
+  const shutdown = () => {
+    if (done) return;
+    done = true;
+    try {
+      db.close(); // checkpoints, then removes -wal and -shm
+    } catch {
+      /* already closed, or never opened */
+    }
+    releaseLock();
+  };
+  process.once("exit", shutdown);
+  // SIGBREAK is Ctrl+Break on Windows. Closing the console window outright
+  // cannot be caught, which is what the recovery path in openDb is for.
+  for (const signal of ["SIGINT", "SIGTERM", "SIGHUP", "SIGBREAK"] as const) {
+    process.once(signal, () => {
+      shutdown();
+      process.exit(signal === "SIGINT" ? 130 : 0);
+    });
+  }
 }
 
 export interface OpenDbOptions {
@@ -349,11 +378,91 @@ export interface OpenDbOptions {
   migrate?: boolean;
 }
 
+/**
+ * Set a write-ahead log aside and report whether there was one.
+ *
+ * Observed on 2026-07-27: the app refused to start with "database disk image is
+ * malformed", and the database was *fine* — copied on its own, without its
+ * `-wal`, it opened with `integrity_check: ok` and all 33,402 rows. Moving the
+ * log aside fixed the live database with nothing lost.
+ *
+ * Be careful about what that proves. SQLite tolerates far more than you would
+ * expect from a damaged log: an all-zero log, a garbage log, a valid header
+ * over garbage frames, and even a *real log belonging to a different database*
+ * were all opened without complaint in testing (the last one was replayed).
+ * So a bad log does not normally cause this. What can is a log whose frames
+ * pass their own checksums but leave the database inconsistent once applied —
+ * which is not something this can synthesise, and so is not covered by a test.
+ *
+ * The log is moved, never deleted: anything committed to it and not yet
+ * checkpointed lives only there, and that is the one thing this can cost.
+ */
+export function quarantineWal(dbPath: string): string | null {
+  const wal = `${dbPath}-wal`;
+  const shm = `${dbPath}-shm`;
+  if (!existsSync(wal)) return null;
+  const dir = join(dirname(dbPath), `quarantined-wal-${new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19)}`);
+  mkdirSync(dir, { recursive: true });
+  renameSync(wal, join(dir, basename(wal)));
+  if (existsSync(shm)) renameSync(shm, join(dir, basename(shm)));
+  return dir;
+}
+
+const MALFORMED = /malformed|not a database|file is encrypted/i;
+
 export function openDb(dbPath: string, opts: OpenDbOptions = {}): DatabaseSync {
   if (dbPath !== ":memory:") mkdirSync(dirname(dbPath), { recursive: true });
   // Workers share the owning process's lock — they are threads, not processes.
-  if (dbPath !== ":memory:" && opts.migrate !== false) acquireLock(dbPath);
+  const releaseLock =
+    dbPath !== ":memory:" && opts.migrate !== false ? acquireLock(dbPath) : null;
+  let db: DatabaseSync;
+  try {
+    db = openAndConfigure(dbPath, opts);
+  } catch (err) {
+    // Only the owner retries: a worker must never move files out from under
+    // the connection its main thread is already using.
+    if (dbPath === ":memory:" || opts.migrate === false || !MALFORMED.test((err as Error).message)) throw err;
+    const moved = quarantineWal(dbPath);
+    if (!moved) throw err;
+    db = openAndConfigure(dbPath, opts); // throws again if the damage is real
+    const check = db.prepare("PRAGMA quick_check(1)").get() as Record<string, string>;
+    console.warn(
+      `[resurface] the database would not open, but only its write-ahead log was bad.\n` +
+        `[resurface] the log was moved to ${moved} (not deleted) and the database opened cleanly` +
+        ` (quick_check: ${Object.values(check)[0]}).\n` +
+        `[resurface] anything written in the last moments before the previous shutdown may not have been saved.`
+    );
+  }
+  if (releaseLock) registerShutdown(db, releaseLock);
+  if (opts.migrate === false) return db;
+  const applied = migrate(db);
+  // Tag tables arrive empty; fill them from what the parser already stored so
+  // upgrading is instant (no vault re-read, no PARSER_VERSION bump).
+  if (applied.includes("004_tags")) backfillSnipTags(db);
+  // Kinds are derived from note shape, so the column arrives empty and is
+  // filled in place — no vault re-read, no PARSER_VERSION bump.
+  if (applied.includes("008_snip_kind")) classifyAll(db);
+  return db;
+}
+
+function openAndConfigure(dbPath: string, opts: OpenDbOptions): DatabaseSync {
   const db = new DatabaseSync(dbPath);
+  try {
+    return configure(db, opts);
+  } catch (err) {
+    // The handle is live even when the first statement fails, and on Windows an
+    // unclosed handle keeps the file locked — which would stop the very
+    // recovery about to be attempted from moving anything.
+    try {
+      db.close();
+    } catch {
+      /* nothing useful to do */
+    }
+    throw err;
+  }
+}
+
+function configure(db: DatabaseSync, opts: OpenDbOptions): DatabaseSync {
   // journal_mode is persistent, so only the migrating connection needs to set
   // it; a second connection flipping it mid-write is one of the races above.
   if (opts.migrate !== false) db.exec("PRAGMA journal_mode = WAL;");
@@ -368,14 +477,6 @@ export function openDb(dbPath: string, opts: OpenDbOptions = {}): DatabaseSync {
   // unbounded WAL is worth preventing on its own: this truncates it back after
   // each checkpoint instead of letting the file grow without limit.
   db.exec("PRAGMA journal_size_limit = 67108864;"); // 64 MB
-  if (opts.migrate === false) return db;
-  const applied = migrate(db);
-  // Tag tables arrive empty; fill them from what the parser already stored so
-  // upgrading is instant (no vault re-read, no PARSER_VERSION bump).
-  if (applied.includes("004_tags")) backfillSnipTags(db);
-  // Kinds are derived from note shape, so the column arrives empty and is
-  // filled in place — no vault re-read, no PARSER_VERSION bump.
-  if (applied.includes("008_snip_kind")) classifyAll(db);
   return db;
 }
 

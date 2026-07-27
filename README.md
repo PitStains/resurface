@@ -17,6 +17,32 @@ goes wrong.
 📋 **[PLAN.md](PLAN.md)** is the full product & engineering plan — architecture, data model, phased roadmap,
 and an "As built" record of where the implementation deliberately diverged from the plan.
 
+## What it looks like
+
+Real screenshots from a 33,402-snip library. **Anything that would name a show, an episode or a snip is
+blurred** — these are one person's listening habits, and the point of the pictures is the app, not the
+library. Nothing else is staged: the numbers, charts and timings are exactly what the app produced.
+
+![Dashboard — counts with period-over-period deltas, listening activity, and a year heatmap](docs/screenshots/dashboard.png)
+
+*The dashboard. Listening time and snip time are shown side by side because they measure different things
+(§ Honest metrics below).*
+
+![The map — 32,196 snips placed by meaning, coloured by topic](docs/screenshots/map.png)
+
+*The similarity map: every snip placed by meaning, coloured by topic, brighter squares are Snipd favorites.
+PCA by power iteration — deterministic, and seconds rather than minutes.*
+
+![Search — three modes, filters for tags, kind and favorites, and an honest result count](docs/screenshots/search.png)
+
+*Search. The line under the filters says what the count actually means — "top 184 blended from 1,384 word
+matches + closest by meaning" — because a hybrid result count is not comparable to a keyword one.*
+
+![Wrapped — a year summarised: hours, episodes, shows, streak, favorites, quotes](docs/screenshots/wrapped.png)
+
+*Wrapped, with the caveat printed on it rather than hidden: listening counts the full length of every episode
+you snipped, so it overcounts anything you didn't finish.*
+
 ## Status
 
 - [x] Plan (v3)
@@ -30,6 +56,15 @@ and an "As built" record of where the implementation deliberately diverged from 
 - [x] Phase 5 — Resurfacing (daily review, on-this-day, digest + feed, serendipity, Wrapped image)
 - [x] Phase 6 — Packaging & polish (verified backups + restore, corruption watch, a11y, install docs)
 - [ ] Phase 7 — Remote access (optional)
+
+## Before you start
+
+Resurface reads the Markdown files the **official Snipd Obsidian plugin** writes — it does not talk to
+Snipd itself. So that sync has to be running first:
+[Sync Your Snips to Obsidian](https://support.snipd.com/en/articles/12750692-sync-your-snips-to-obsidian).
+Install the *Snipd official* plugin from Obsidian's community plugins, connect your Snipd account, and let
+one sync finish. Everything below assumes a folder of snips already exists; without it there is nothing to
+index.
 
 ## Running it
 
@@ -50,7 +85,7 @@ npm install
 npm run import          # read the vault into SQLite (idempotent)
 npm run build:web
 npm run serve           # http://127.0.0.1:7433
-npm test                # 189 tests
+npm test                # 197 tests
 npm run typecheck
 ```
 

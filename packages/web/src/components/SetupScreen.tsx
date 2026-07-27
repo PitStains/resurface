@@ -45,11 +45,20 @@ export default function SetupScreen({ onDone }: { onDone: () => void }) {
         <h1 className="mb-2 text-xl font-semibold">Welcome to Resurface</h1>
         <p className="ink-2 mb-4 text-sm">
           Point Resurface at your Snipd export folder — the one the{" "}
-          <a className="link" href="https://www.snipd.com/blog/sync-snips-to-obsidian-plugin" target="_blank" rel="noreferrer">
+          <a
+            className="link"
+            href="https://support.snipd.com/en/articles/12750692-sync-your-snips-to-obsidian"
+            target="_blank"
+            rel="noreferrer"
+          >
             Snipd Obsidian plugin
           </a>{" "}
           syncs to. You can paste the vault root or the <code>Snipd\Data</code> folder itself; your files are only
           ever read, never modified.
+          <br />
+          <span className="muted">
+            No folder yet? That sync has to be set up in Obsidian first — Resurface reads what it writes.
+          </span>
         </p>
 
         {detect && detect.candidates.length > 0 && (

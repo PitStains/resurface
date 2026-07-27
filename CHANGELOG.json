@@ -1,5 +1,19 @@
 [
   {
+    "version": "0.12.6",
+    "date": "2026-07-27",
+    "changes": [
+      "A database that will not open because of its write-ahead log now recovers itself instead of stopping the app",
+      "Shutting down now closes the database properly, so it stops leaving a write-ahead log behind every time",
+      "The log is moved aside and kept, never deleted, and the app says loudly what it did",
+      "Damage in the database itself is still reported as before - recovery never papers over a real problem",
+      "Setup now links to Snipd's own guide for syncing snips to Obsidian, which has to be working first"
+    ],
+    "whatToTest": [
+      "Nothing to do. If the app ever refuses to start again, it should now start anyway and tell you what it moved"
+    ]
+  },
+  {
     "version": "0.12.5",
     "date": "2026-07-27",
     "changes": [
@@ -12,7 +26,8 @@
     "whatToTest": [
       "Nothing user-facing should have changed; this release is repository housekeeping before the code goes public"
     ]
-  },{
+  },
+  {
     "version": "0.12.4",
     "date": "2026-07-27",
     "changes": [
@@ -26,7 +41,8 @@
       "Sync now with new snips in your vault - the dashboard should show it embedding them without being asked",
       "Dashboard - Meaning index - it should say 'ready' and leave you alone"
     ]
-  },{
+  },
+  {
     "version": "0.12.3",
     "date": "2026-07-27",
     "changes": [
@@ -44,7 +60,8 @@
       "Ask - 'Package this library for NotebookLM' - try 'One file per category', which fits even the free plan",
       "Create the import folder; it should open in Explorer with a sources folder and HOW-TO-IMPORT.md beside it"
     ]
-  },{
+  },
+  {
     "version": "0.12.2",
     "date": "2026-07-27",
     "changes": [
@@ -57,7 +74,8 @@
       "Start Resurface.bat, then click and drag inside the black window - the app should keep working",
       "Close the window while the app is open in the browser; you should get a red bar saying it isn't responding, which clears itself if you start it again"
     ]
-  },{
+  },
+  {
     "version": "0.12.1",
     "date": "2026-07-26",
     "changes": [
@@ -72,7 +90,8 @@
       "Dashboard - Backups - Back up now; the panel should report the snips and vectors it verified",
       "Everything should behave exactly as before; this release is mostly about what happens when things go wrong"
     ]
-  },{
+  },
+  {
     "version": "0.12.0",
     "date": "2026-07-26",
     "changes": [
@@ -104,7 +123,8 @@
       "Dashboard → Backups should say 'checked and sound'",
       "Read INSTALL.md and try the autostart steps if you want it running at login"
     ]
-  },{
+  },
+  {
     "version": "0.10.0",
     "date": "2026-07-26",
     "changes": [
@@ -149,7 +169,8 @@
       "Review → expand a card; a hand-made snip should show its whole note inline",
       "Collapse it again — the page should return exactly to where it was"
     ]
-  },{
+  },
+  {
     "version": "0.9.0",
     "date": "2026-07-21",
     "changes": [
@@ -324,7 +345,11 @@
   {
     "version": "0.1.0",
     "date": "2026-07-20",
-    "changes": ["Phase 0: vault parser, database, CLI import with HTML report"],
-    "whatToTest": ["Run Start Resurface.bat and review the import report"]
+    "changes": [
+      "Phase 0: vault parser, database, CLI import with HTML report"
+    ],
+    "whatToTest": [
+      "Run Start Resurface.bat and review the import report"
+    ]
   }
 ]

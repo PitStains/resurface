@@ -4,6 +4,11 @@ Everything here is local. Nothing is published, nothing phones home, and no acco
 
 ## Requirements
 
+- **Your snips already syncing to Obsidian.** This is the one thing Resurface cannot do for you. It reads
+  the Markdown the official Snipd plugin writes; if that sync isn't running, there is nothing to read.
+  Set it up first — [Sync Your Snips to Obsidian](https://support.snipd.com/en/articles/12750692-sync-your-snips-to-obsidian):
+  install the **Snipd official** plugin from Obsidian's community plugins, click **Connect** to sign in
+  with your Snipd account, then **Start syncing**. Let it finish once before running Resurface.
 - **Node.js 22 or newer** (developed on 25). `node --version` to check.
 - **Windows, macOS or Linux.** The `.bat` shortcuts are Windows; elsewhere use the npm scripts.
 - About **1.5 GB** free: the database grows with your library, and backups keep three snapshots by default.
@@ -90,6 +95,12 @@ puts it into "Select" mode** — the title bar changes to `Select …` — and t
 the window the next time it prints anything. Press **Esc** in that window and everything resumes, nothing is
 lost. Since v0.12.2 the `.bat` files send the server's output to a log file instead, so a stray click can no
 longer reach it; if you start the server by hand with `npm run serve`, the old exposure is still there.
+
+**"database disk image is malformed" on startup.** Since v0.12.6 the app handles the common case itself: if
+the database is sound and only its write-ahead log is not, the log is moved into a `quarantined-wal-…`
+folder beside the database (kept, never deleted), the app starts, and it prints what it did. Anything
+written in the final moments before the previous shutdown may not have survived; everything else is intact.
+If it still refuses to start, the database itself is damaged — restore a snapshot from *Backups*.
 
 **The dashboard warns that the database has a problem.** Open *Backups* and restore the most recent
 snapshot; it is verified before it is offered. The database being replaced is moved aside, never deleted, and
